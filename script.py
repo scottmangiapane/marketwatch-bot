@@ -1,15 +1,34 @@
+import json
 import requests
 
-game = input('Enter your game: ')
+email = input('Email: ')
+password = input('Password: ')
+session = requests.Session()
 
-cookie = input('Enter your cookie: ')
-
-url = 'http://www.marketwatch.com/game/' + game + '/trade/submitorder'
-headers = {
+id_url = 'http://id.marketwatch.com/auth/submitlogin.json'
+id_headers = {
     'Content-Type': 'application/json',
-    'Cookie': cookie,
 }
-json = [{"Fuid": "EXCHANGETRADEDFUND-XASQ-JNUG", "Shares": "1", "Type": "Buy", "Term": "Cancelled"}]
+id_json = {
+    'username': email,
+    'password': password,
+    'savelogin': 'true',
+}
+id_response = session.post(url=id_url, headers=id_headers, json=id_json)
 
-r = requests.post(url=url, headers=headers, json=json)
-print(r.text)
+try:
+    session.get(url=json.loads(id_response.text)["url"])
+except KeyError:
+    print("Login failed.")
+    exit(1)
+
+
+game = input('Enter your game: ')
+game_url = 'http://www.marketwatch.com/game/' + game + '/trade/submitorder'
+game_headers = {
+    'Content-Type': 'application/json',
+}
+
+game_json = [{"Fuid": "EXCHANGETRADEDFUND-XASQ-JNUG", "Shares": "1", "Type": "Buy"}]
+game_response = session.post(url=game_url, headers=game_headers, json=game_json)
+print(game_response.text)
