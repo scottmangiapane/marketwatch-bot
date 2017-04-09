@@ -1,6 +1,6 @@
 from html.parser import HTMLParser
 
-class CustomParser(HTMLParser):
+class StockParser(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
         self.buying_power = ''
@@ -11,9 +11,9 @@ class CustomParser(HTMLParser):
         pass
 
     def handle_starttag(self, tag, attrs):
-        if tag == 'ul':
+        if tag == 'div':
             for name, value in attrs:
-                if value == 'cubby worth':
+                if value == 'row first cubby':
                     self.recording = 1
 
     def handle_endtag(self, tag):
@@ -25,16 +25,11 @@ class CustomParser(HTMLParser):
             self.raw.append(data.strip())
 
     def get_data(self):
-        data = {}
-        tags = ['Net Worth',
-                'Overall Gains',
-                'Overall Returns',
-                'Today\'s Gains',
-                'Buying Power',
-                'Cash Remaining',
-                'Cash Borrowed',
-                'Short Reserve']
         for i in range(0, len(self.raw)):
-            if self.raw[i] in tags:
-                data[self.raw[i]] = self.raw[i + 1]
-        return data
+            if self.raw[i] == '$':
+                try:
+                    data = float(self.raw[i + 1].replace(',', ''))
+                except ValueError:
+                    data = 0.0
+                return data
+        return 0.0

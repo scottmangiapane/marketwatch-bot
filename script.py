@@ -1,8 +1,10 @@
 import json
-import parser
+import status_parser
+import stock_parser
 import requests
 
-custom_parser = parser.CustomParser()
+status_parser = status_parser.StatusParser()
+stock_parser = stock_parser.StockParser()
 session = requests.Session()
 
 email = input('Email: ')
@@ -26,10 +28,15 @@ def login():
         print('Login failed.')
         exit(1)
 
-def scan():
-    data_response = session.get('http://www.marketwatch.com/game/' + game + '/portfolio/Orders')
-    custom_parser.feed(data_response.text)
-    return custom_parser.get_data()
+def scan_status():
+    status_response = session.get('http://www.marketwatch.com/game/' + game + '/portfolio/Orders')
+    status_parser.feed(status_response.text)
+    return status_parser.get_data()
+
+def scan_stock(fuid):
+    stock_response = session.get('http://www.marketwatch.com/game/d/trade/getpopup?fuid=' + fuid)
+    stock_parser.feed(stock_response.text)
+    return stock_parser.get_data()
 
 def trade(name, shares, mode, limit):
     game_url = 'http://www.marketwatch.com/game/' + game + '/trade/submitorder'
@@ -42,8 +49,10 @@ def trade(name, shares, mode, limit):
 
 login()
 
-data = scan()
-print(data['Buying Power'])
+status = scan_status()
+print(status)
+stock = scan_stock('EXCHANGETRADEDFUND-XASQ-JNUG')
+print(stock)
 
 response = trade('EXCHANGETRADEDFUND-XASQ-JNUG', '1', 'Buy', '6.75')
 print(response)
