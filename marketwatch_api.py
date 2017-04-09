@@ -9,6 +9,10 @@ class MarketWatchAPI:
         self.stock_parser = stock_parser.StockParser()
         self.session = requests.Session()
 
+    def clear_orders(self, game):
+        for item in self.scan_status(game)['orders']:
+            self.session.get('http://www.marketwatch.com' + item)
+
     def login(self, email, password):
         id_url = 'http://id.marketwatch.com/auth/submitlogin.json'
         id_headers = {

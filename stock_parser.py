@@ -3,7 +3,6 @@ from html.parser import HTMLParser
 class StockParser(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
-        self.buying_power = ''
         self.recording = 0
         self.raw = []
 
