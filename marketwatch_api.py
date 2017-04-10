@@ -24,10 +24,11 @@ class MarketWatchAPI:
             'savelogin': 'true',
         }
         id_response = self.session.post(url=id_url, headers=id_headers, json=id_json)
+        id_response = json.loads(id_response.text)
+        print('Login:', id_response['result'])
         try:
-            self.session.get(url=json.loads(id_response.text)['url'])
+            self.session.get(url=id_response['url'])
         except KeyError:
-            print('Login failed.')
             exit(1)
 
     def scan_status(self, game):
@@ -47,4 +48,5 @@ class MarketWatchAPI:
         }
         game_json = [{'Fuid': name, 'Shares': shares, 'Type': mode, 'Limit': limit}]
         game_response = self.session.post(url=game_url, headers=game_headers, json=game_json)
-        return game_response.text
+        game_response = json.loads(game_response.text)
+        return game_response
