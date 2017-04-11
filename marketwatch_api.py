@@ -34,12 +34,16 @@ class MarketWatchAPI:
     def scan_status(self, game):
         status_response = self.session.get('http://www.marketwatch.com/game/' + game + '/portfolio/Orders')
         self.status_parser.feed(status_response.text)
-        return self.status_parser.get_data()
+        data = self.status_parser.get_data()
+        self.status_parser.reset()
+        return data
 
-    def scan_stock(self, fuid):
-        stock_response = self.session.get('http://www.marketwatch.com/game/d/trade/getpopup?fuid=' + fuid)
+    def scan_stock(self, symbol):
+        stock_response = self.session.get('http://www.marketwatch.com/game/d/trade/getpopup?fuid=' + symbol)
         self.stock_parser.feed(stock_response.text)
-        return self.stock_parser.get_data()
+        data = self.stock_parser.get_data()
+        self.stock_parser.reset()
+        return data
 
     def trade(self, game, name, shares, mode, limit):
         game_url = 'http://www.marketwatch.com/game/' + game + '/trade/submitorder'

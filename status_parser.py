@@ -49,3 +49,9 @@ class StatusParser(HTMLParser):
                     value = 0.0
                 stats[self.rawStats[i]] = value
         return {'stats': stats, 'orders': self.orders}
+
+    def reset(self):
+        HTMLParser.reset(self)
+        self.orders = []
+        self.recording = 0
+        self.rawStats = []

@@ -32,3 +32,8 @@ class StockParser(HTMLParser):
                     data = 0.0
                 return data
         return 0.0
+
+    def reset(self):
+        HTMLParser.reset(self)
+        self.recording = 0
+        self.raw = []
