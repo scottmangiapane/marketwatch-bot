@@ -43,11 +43,11 @@ while True:
         reset_data()
         if direction > 0:
             print('Buy at:', stock)
-            response = api.trade(game, symbol, '2000', 'Buy', 'Cancelled', None, None)
+            response = api.trade_normal(game, symbol, '2000', 'Buy', 'Cancelled')
             print('Sell at:', stock + 0.02)
-            response = api.trade(game, symbol, '2000', 'Sell', 'Cancelled', stock + 0.02, None)
+            response = api.trade_limit(game, symbol, '2000', 'Sell', 'Cancelled', stock + 0.02)
         elif direction < -0:
             print('Short at:', stock)
-            response = api.trade(game, symbol, '2000', 'Short', 'Cancelled', None, None)
+            response = api.trade_normal(game, symbol, '2000', 'Short', 'Cancelled')
             print('Cover at:', stock - 0.02)
-            response = api.trade(game, symbol, '2000', 'Cover', 'Cancelled', stock - 0.02, None)
+            response = api.trade_limit(game, symbol, '2000', 'Cover', 'Cancelled', stock - 0.02)
