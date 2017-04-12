@@ -45,12 +45,12 @@ class MarketWatchAPI:
         self.stock_parser.reset()
         return data
 
-    def trade(self, game, name, shares, mode, limit):
+    def trade(self, game, name, shares, mode, term, limit, stop):
         game_url = 'http://www.marketwatch.com/game/' + game + '/trade/submitorder'
         game_headers = {
             'Content-Type': 'application/json',
         }
-        game_json = [{'Fuid': name, 'Shares': shares, 'Type': mode, 'Limit': limit}]
+        game_json = [{'Fuid': name, 'Shares': shares, 'Type': mode, 'Term': term, 'Limit': limit, 'Stop': stop}]
         game_response = self.session.post(url=game_url, headers=game_headers, json=game_json)
         game_response = json.loads(game_response.text)
         return game_response

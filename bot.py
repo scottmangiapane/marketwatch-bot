@@ -1,18 +1,11 @@
 import time
 import marketwatch_api
 
-email = input('Email: ')
-password = input('Password: ')
-game = input('Enter your game: ')
-symbol = input('Enter the stock symbol: ')
-
-api = marketwatch_api.MarketWatchAPI()
-api.login(email, password)
-
-data = []
-initial = api.scan_stock(symbol)
-for _ in range(0, 10):
-    data.append(initial)
+def reset_data():
+    initial = api.scan_stock(symbol)
+    for _ in range(0, 30):
+        data.append(initial)
+        data.pop(0)
 
 def estimate():
     start = time.time()
@@ -25,22 +18,36 @@ def estimate():
         pass
     return diff
 
+email = input('Email: ')
+password = input('Password: ')
+game = input('Enter your game: ')
+symbol = input('Enter the stock symbol: ')
+
+api = marketwatch_api.MarketWatchAPI()
+api.login(email, password)
+
+data = []
+reset_data()
+
 while True:
     status = api.scan_status(game)
     direction = 0
-    print('Direction:')
-    while abs(direction) < 0.02:
+    print('Direction:', end='', flush=True)
+    while abs(direction) < 0.015:
         direction = estimate()
-        print('  ', direction)
     stock = api.scan_stock(symbol)
-    if status['stats']['Buying Power'] >= stock * 1500:
+    if status['stats']['Buying Power'] < stock * 2000:
+        print('ERROR: Not enough funds')
+    else:
+        print(round(direction, 4))
+        reset_data()
         if direction > 0:
-            print('Buy at: ', stock)
-            response = api.trade(game, symbol, '1500', 'Buy', None)
-            print('Sell at: ', stock + 0.02)
-            response = api.trade(game, symbol, '1500', 'Sell', stock + 0.02)
+            print('Buy at:', stock)
+            response = api.trade(game, symbol, '2000', 'Buy', 'Cancelled', None, None)
+            print('Sell at:', stock + 0.02)
+            response = api.trade(game, symbol, '2000', 'Sell', 'Cancelled', stock + 0.02, None)
         elif direction < -0:
-            print('Short at: ', stock)
-            response = api.trade(game, symbol, '1500', 'Short', None)
-            print('Cover at: ', stock - 0.02)
-            response = api.trade(game, symbol, '1500', 'Cover', stock - 0.02)
+            print('Short at:', stock)
+            response = api.trade(game, symbol, '2000', 'Short', 'Cancelled', None, None)
+            print('Cover at:', stock - 0.02)
+            response = api.trade(game, symbol, '2000', 'Cover', 'Cancelled', stock - 0.02, None)
