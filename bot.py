@@ -1,15 +1,20 @@
 import time
 import marketwatch_api
 
+email = input('Email: ')
+password = input('Password: ')
+game = input('Enter your game: ')
+symbol = input('Enter the stock symbol: ')
+
 def reset_data():
-    initial = api.scan_stock(symbol)
+    initial = api.parse_stock(symbol)
     for _ in range(0, 30):
         data.append(initial)
         data.pop(0)
 
 def estimate():
     start = time.time()
-    data.append(api.scan_stock(symbol))
+    data.append(api.parse_stock(symbol))
     data.pop(0)
     diff = 0
     for i in range(1, len(data)):
@@ -18,24 +23,23 @@ def estimate():
         pass
     return diff
 
-email = input('Email: ')
-password = input('Password: ')
-game = input('Enter your game: ')
-symbol = input('Enter the stock symbol: ')
-
 api = marketwatch_api.MarketWatchAPI()
 api.login(email, password)
+
+status = api.parse_stock(symbol)
+print(status)
+exit(0)
 
 data = []
 reset_data()
 
 while True:
-    status = api.scan_status(game)
+    status = api.parse_player(game)
     direction = 0
     print('Direction:', end='', flush=True)
     while abs(direction) < 0.015:
         direction = estimate()
-    stock = api.scan_stock(symbol)
+    stock = api.parse_stock(symbol)
     if status['stats']['Buying Power'] < stock * 2000:
         print('ERROR: Not enough funds')
     else:

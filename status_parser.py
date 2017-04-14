@@ -32,7 +32,6 @@ class StatusParser(HTMLParser):
             self.rawStats.append(data.strip())
 
     def get_data(self):
-        stats = {}
         tags = ['Net Worth',
                 'Overall Gains',
                 'Overall Returns',
@@ -41,11 +40,12 @@ class StatusParser(HTMLParser):
                 'Cash Remaining',
                 'Cash Borrowed',
                 'Short Reserve']
+        stats = {}
         for i in range(0, len(self.rawStats)):
             if self.rawStats[i] in tags:
                 try:
                     value = float(self.rawStats[i + 1].strip('$%,').replace(',', ''))
-                except ValueError:
+                except:
                     value = 0.0
                 stats[self.rawStats[i]] = value
         return {'stats': stats, 'orders': self.orders}

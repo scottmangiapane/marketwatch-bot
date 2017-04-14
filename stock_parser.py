@@ -24,14 +24,14 @@ class StockParser(HTMLParser):
             self.raw.append(data.strip())
 
     def get_data(self):
+        data = 0.0
         for i in range(0, len(self.raw)):
             if self.raw[i] == '$':
                 try:
                     data = float(self.raw[i + 1].replace(',', ''))
-                except ValueError:
-                    data = 0.0
-                return data
-        return 0.0
+                except:
+                    pass
+        return data
 
     def reset(self):
         HTMLParser.reset(self)

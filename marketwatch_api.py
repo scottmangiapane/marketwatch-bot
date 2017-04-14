@@ -9,8 +9,17 @@ class MarketWatchAPI:
         self.stock_parser = stock_parser.StockParser()
         self.session = requests.Session()
 
+    def __trade(self, game, game_json):
+        game_url = 'http://www.marketwatch.com/game/' + game + '/trade/submitorder'
+        game_headers = {
+            'Content-Type': 'application/json',
+        }
+        game_response = self.session.post(url=game_url, headers=game_headers, json=game_json)
+        game_response = json.loads(game_response.text)
+        return game_response
+
     def clear_orders(self, game):
-        for item in self.scan_status(game)['orders']:
+        for item in self.parse_player(game)['orders']:
             self.session.get('http://www.marketwatch.com' + item)
 
     def login(self, email, password):
@@ -31,28 +40,19 @@ class MarketWatchAPI:
         except KeyError:
             exit(1)
 
-    def scan_status(self, game):
+    def parse_player(self, game):
         status_response = self.session.get('http://www.marketwatch.com/game/' + game + '/portfolio/Orders')
         self.status_parser.feed(status_response.text)
         data = self.status_parser.get_data()
         self.status_parser.reset()
         return data
 
-    def scan_stock(self, symbol):
+    def parse_stock(self, symbol):
         stock_response = self.session.get('http://www.marketwatch.com/game/d/trade/getpopup?fuid=' + symbol)
         self.stock_parser.feed(stock_response.text)
         data = self.stock_parser.get_data()
         self.stock_parser.reset()
         return data
-
-    def __trade(self, game, game_json):
-        game_url = 'http://www.marketwatch.com/game/' + game + '/trade/submitorder'
-        game_headers = {
-            'Content-Type': 'application/json',
-        }
-        game_response = self.session.post(url=game_url, headers=game_headers, json=game_json)
-        game_response = json.loads(game_response.text)
-        return game_response
 
     def trade_normal(self, game, name, shares, mode, term):
         game_json = [{'Fuid': name, 'Shares': shares, 'Type': mode, 'Term': term}]
